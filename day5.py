@@ -7,6 +7,11 @@ if image is None:
     print("Image not found.")
     exit()
 
+# Show and save the original image
+cv2.imshow("Original Image", image)
+cv2.imwrite('outputs/original_image.jpg', image)
+
+# Convert to grayscale and back to BGR
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
 
@@ -21,7 +26,7 @@ cv2.line(gray_bgr, (width, 0), (0, height), (0, 255, 0), 2)  # Green
 # 2. Draw centered filled circle
 cv2.circle(gray_bgr, (center_x, center_y), 50, (255, 0, 0), -1)  # Blue
 
-# 3. Yellow triangle above dog's head
+# 3. Yellow triangle above center
 triangle_top = center_y - 120
 triangle_pts = np.array([
     [center_x - 50, triangle_top + 60],
@@ -50,8 +55,9 @@ x2 = (width - text_width2) // 2
 y2 = height - 20
 cv2.putText(gray_bgr, text2, (x2, y2), font, scale, (0, 165, 255), thickness)  
 
-# 5. Save and show
+# 5. Save and show final result
 cv2.imwrite('outputs/annotated_image.jpg', gray_bgr)
-cv2.imshow("Final Annotated Image", gray_bgr)
+cv2.imshow("Annotated Image", gray_bgr)
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
