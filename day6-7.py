@@ -1,39 +1,37 @@
 import cv2
 import os
 
-# Create output directory
-os.makedirs('outputs', exist_ok=True)
+os.makedirs('output', exist_ok=True)
 
-# Load the image
 image = cv2.imread('sample.jpg')
+
 if image is None:
-    print("Image not found.")
-    exit()
+    print("Error: Image not found.")
+else:
+    image = cv2.resize(image, (300, 300))
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (7, 7), 0)
+    edges = cv2.Canny(blurred, 50, 150)
+    _, thresholded = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
-# Save original image
-cv2.imwrite('outputs/original.jpg', image)
+    cv2.imwrite('output/gray_sample.jpg', gray)
+    cv2.imwrite('output/blurred_sample.jpg', blurred)
+    cv2.imwrite('output/edges_sample.jpg', edges)
+    cv2.imwrite('output/thresholded_sample.jpg', thresholded)
 
-# 1. Convert to grayscale
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-cv2.imwrite('outputs/gray.jpg', gray)
+    gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    blurred_bgr = cv2.cvtColor(blurred, cv2.COLOR_GRAY2BGR)
+    edges_bgr = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+    thresholded_bgr = cv2.cvtColor(thresholded, cv2.COLOR_GRAY2BGR)
 
-# 2. Apply stronger Gaussian Blur for more visible smoothening
-blurred = cv2.GaussianBlur(gray, (15, 15), 0)
-cv2.imwrite('outputs/blurred.jpg', blurred)
+    row1 = cv2.hconcat([gray_bgr, blurred_bgr])
+    row2 = cv2.hconcat([edges_bgr, thresholded_bgr])
+    combined = cv2.vconcat([row1, row2])
 
-# 3. Apply Canny Edge Detection with lower threshold for more edges
-edges = cv2.Canny(blurred, 30, 100)
-cv2.imwrite('outputs/edges.jpg', edges)
+    cv2.imwrite('output/combined_processed.jpg', combined)
 
-# 4. Binary Thresholding with a lower threshold value
-_, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-cv2.imwrite('outputs/threshold.jpg', thresh)
+    cv2.imshow("Original Image", image)
+    cv2.imshow("Processed Outputs", combined)
 
-# Show results
-cv2.imshow('Original', image)
-cv2.imshow('Grayscale', gray)
-cv2.imshow('Blurred (Stronger)', blurred)
-cv2.imshow('Edges (More Visible)', edges)
-cv2.imshow('Threshold (Lower Value)', thresh)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
